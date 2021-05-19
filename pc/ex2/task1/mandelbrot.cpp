@@ -31,7 +31,7 @@ bool mandelbrot(complex<double> c, vector<int>& pixel) {
     }
 
 
-    pixel = {omp_get_thread_num()* 30, omp_get_thread_num()* 30, omp_get_thread_num()* 30}; // ouside -> white 255,255,255
+    pixel = {omp_get_thread_num()*5, omp_get_thread_num()*5, omp_get_thread_num()*5}; // ouside -> white 255,255,255
     return true;
 }
 
@@ -53,7 +53,8 @@ int main(int argc, char **argv) {
 	//auto t1 = chrono::high_resolution_clock::now();
 	auto t1 = omp_get_wtime(); // <-- use this time when you switch to OpenMP
 
-    #pragma omp parallel for collapse(2) private(c) firstprivate(pixel, height, width)
+	//REPLACE SHEDULING WITH DYNAMIC OR STATIC
+    #pragma omp parallel for schedule(guided) collapse(2) private(c) firstprivate(pixel, height, width)
     for (i = 0; i < height; i++) {
         for (j = 0; j < width; j++) {
             c = complex<double>( 2.0*((double)j/width-0.75), ((double)i/height-0.5)*2.0);
@@ -73,7 +74,7 @@ int main(int argc, char **argv) {
     
 	// auto t2 = chrono::high_resolution_clock::now();
 	auto t2 = omp_get_wtime(); // <-- use this time when you switch to OpenMP
-    
+
     // save image
     std::ofstream ofs("mandelbrot.ppm", std::ofstream::out);
     ofs << "P3" << std::endl;
